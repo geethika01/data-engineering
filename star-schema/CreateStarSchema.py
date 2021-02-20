@@ -23,7 +23,7 @@ import psycopg2
 
 try:
     conn = psycopg2.connect("host=192.168.193.159 dbname=studentdb\
-                            user=geethika password=Happy01")
+                            user=geethika password=*******")
 except psycopg2.Error as e:
     print("Error: Could not connect to the database")
     print(e)
