@@ -23,7 +23,7 @@ import psycopg2
 
 try:
     conn = psycopg2.connect("host=192.168.193.159 dbname=studentdb\
-                            user=geethika password=*******")
+                            user=geethika password=Happy01")
 except psycopg2.Error as e:
     print("Error: Could not connect to the database")
     print(e)
@@ -44,7 +44,8 @@ conn.set_session(autocommit=True)
 
 try:
     cur.execute("CREATE TABLE IF NOT EXISTS customer_transactions \
-                (customer_id int, store_id int, spent numeric(4,2))")
+                (customer_id int, store_id int, spent numeric(4,2),\
+                PRIMARY KEY (customer_id, store_id))")
 except psycopg2.Error as e:
     print("Issue creating Fact table")
     print(e)
@@ -87,7 +88,7 @@ while row:
 # customer table
 try:
     cur.execute("CREATE TABLE IF NOT EXISTS customer \
-                (customer_id int, name varchar, rewards char(1))")
+                (customer_id int PRIMARY KEY, name varchar, rewards char(1))")
 except psycopg2.Error as e:
     print ("Error: Could not create customer table")
     print (e)
@@ -95,7 +96,7 @@ except psycopg2.Error as e:
 # store table    
 try:
     cur.execute("CREATE TABLE IF NOT EXISTS store \
-                (store_id int, state char(2))")
+                (store_id int PRIMARY KEY, state char(2))")
 except psycopg2.Error as e:
     print ("Error: Could not create store table")
     print (e)    
@@ -104,6 +105,7 @@ except psycopg2.Error as e:
 try:
     cur.execute("CREATE TABLE IF NOT EXISTS items_purchased \
                 (customer_id int, item_number int, item_name varchar)")
+               
 except psycopg2.Error as e:
     print ("Error: Could not create items_purchased table")
     print (e)
@@ -239,6 +241,53 @@ except psycopg2.Error as e:
     print("Error: cannot execute query 1")
     print (e)
 
+
+row = cur.fetchone()
+while row:
+    print(row)
+    row=cur.fetchone()
+    
+#----------------------------------------------------------------------------
+# Update Customer table - Try to update row where on conflict do nothing
+
+try:
+    cur.execute("INSERT INTO customer (customer_id, name, rewards) \
+                VALUES(%s, %s, %s) \
+                ON CONFLICT (customer_id) \
+                DO NOTHING;", (1, "Amanda", "N"))
+except psycopg2.Error as e:
+    print("Error: when inserting new record")
+    print (e)
+    
+try:
+    cur.execute("SELECT * FROM customer")
+except psycopg2.Error as e:
+    print("Error: cannot execute select * for customer table")
+    print (e)
+
+row = cur.fetchone()
+while row:
+    print(row)
+    row=cur.fetchone()
+    
+# Update Customer table - Try to update row where on conflict do update
+
+try:
+    cur.execute("INSERT INTO customer (customer_id, name, rewards) \
+                VALUES(%s, %s, %s) \
+                ON CONFLICT (customer_id) \
+                DO UPDATE \
+                    SET rewards = 'N'; " , (1, "Amanda", "Y"))
+    
+except psycopg2.Error as e:
+    print("Error: when inserting new record")
+    print (e)
+    
+try:
+    cur.execute("SELECT * FROM customer")
+except psycopg2.Error as e:
+    print("Error: cannot execute select * for customer table")
+    print (e)
 
 row = cur.fetchone()
 while row:
