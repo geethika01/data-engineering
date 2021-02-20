@@ -296,11 +296,11 @@ while row:
 
 #----------------------------------------------------------------------    
 # Drop tables
-table_names = ["customer_transactions", "customer", "store", "items_purchased"]
-
-for tbl in table_names:
-    try:
-        cur.execute("DROP TABLE " + tbl)
-    except psycopg2.Error as e:
-        print("Error dropping table " + tbl)
-        print (e)
+try:
+    cur.execute("DROP TABLE customer_transactions, customer, store, items_purchased")
+except psycopg2.Error as e:
+    print("Error dropping tables ")
+    print (e)
+        
+cur.close()
+conn.close()
